@@ -50,6 +50,8 @@ It does this by taking advantage of `rutorrent`'s RPC functionality. It supports
 
 Due to the vagueness surrounding `rutorrent`, I have no idea if this is compatible with future or previous versions of `rutorrent`. This was developed against two seedboxes that both run version 3.2 of `rutorrent` (and thus also version 3.2 of either RPC plug-in).
 
+The included XML-RPC library in PHP is copied verbatim from [Drupal 7.7][drupal-7.7].
+
 
 ## Future plans
 
@@ -66,3 +68,4 @@ Due to the vagueness surrounding `rutorrent`, I have no idea if this is compatib
 [dps.net-downloads]: http://driverpacks.net/downloads
 [dps.net-stats]: http://driverpacks.net/stats
 [opentracker-module]: http://drupal.org/project/opentracker
+[drupal-7.7]: http://drupal.org/drupal-7.7

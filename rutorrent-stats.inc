@@ -159,8 +159,6 @@ function _rutorrent_stats_xmlrpc_generate_request() {
 EOF;
   $request->headers = array(
     'Content-type: text/xml',
-    'Content-Length: ' . strlen($request->post),
-    "\r\n",
   );
 
   return $request;

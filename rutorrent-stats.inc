@@ -39,12 +39,18 @@ function _get_seedbox_statistics($url, $username, $password, $authtype, $rpc) {
     );
   }
 
-  // Ensure authentication worked.
+  // Ensure authentication worked and that the RPC URL is correct.
   $http_code = curl_getinfo($ch, CURLINFO_HTTP_CODE);
   if ($http_code == 401) {
     return array(
       'online' => FALSE,
       'offline-reason' => 'Authentication failed.',
+    );
+  }
+  else if ($http_code == 404) {
+    return array(
+      'online' => FALSE,
+      'offline-reason' => 'Bad RPC URL: got a 404.',
     );
   }
 

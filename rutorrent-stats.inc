@@ -59,11 +59,24 @@ function _get_seedbox_statistics($url, $username, $password, $authtype, $rpc) {
   // Work with the data.
   $f = "_rutorrent_stats_${rpc}_decode_answer";
   $answer = $f($result);
+  if ($answer == false) {
+    return array(
+      'online' => FALSE,
+      'offline-reason' =>'parse error answer',
+    );
+  }
   $num_torrents = count(array_keys($answer));
 
   // Gather statistics.
   $f = "_rutorrent_stats_${rpc}_get_indices";
   $indices = $f();
+  if ($indices == false) {
+    return array(
+      'online' => FALSE,
+      'offline-reason' =>'parse error indices',
+    );
+
+  }
   $size = 0;
   $ul_speed = 0;
   $ul_size = 0;
@@ -170,17 +183,16 @@ EOF;
 }
 
 function _rutorrent_stats_xmlrpc_decode_answer($answer) {
-  include('xmlrpc.inc');
+  include_once('xmlrpc.inc');
 
   // PHP's xmlrpc_decode() doesn't support 64-bit ints, nor do we need it
   // here, hence use the hack described at
   // http://www.php.net/manual/en/function.xmlrpc-decode.php#93080
   $answer = str_replace('i8>', 'i4>', $answer);
-
   // Now parse what we've got back
   $message = xmlrpc_message($answer);
   if (!xmlrpc_message_parse($message)) {
-    print 'Parse error!';
+    return false;
   }
   $data = $message->params[0];
 

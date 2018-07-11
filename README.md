@@ -2,6 +2,10 @@
 
 rutorrent-stats is a small PHP script that makes it possible to check the vitals of one or more seedboxes running [`rtorrent`][rtorrent] with a [`rutorrent`][rutorrent] front-end (Web UI).
 
+## html fronted
+
+![fronted](https://i.imgur.com/HA4kc9e.png)
+
 
 ## Live sites
 `rutorrent-stats` is used in a production environment at <http://driverpacks.net> — you can see the results at the [downloads][dps.net-downloads] and [statistics][dps.net-stats] pages. There, they are used in tandem with the [OpenTracker Drupal module][opentracker-module].

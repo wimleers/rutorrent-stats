@@ -1,0 +1,169 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="utf-8">
+    <title>Puya seedbox stats</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/bulma/0.7.1/css/bulma.min.css">
+    <script defer src="https://use.fontawesome.com/releases/v5.0.7/js/all.js"></script>
+		<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/2.7.2/Chart.bundle.js"></script>
+	<script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/handlebars.js/4.0.11/handlebars.min.js"></script>
+<script>
+
+$(document).ready(function(){
+      $.ajaxSetup({ cache: false });
+    var tmp = Handlebars.compile($("#tmpl").html());
+    var config_uploads = {
+        type:'line',
+        data: {
+            labels:[],
+            datasets:[{},{},{},{}]
+        },
+        options: {
+            title:{
+                display:true,
+                text:'Upload speed'
+            },
+            scales: {
+                yAxes: [{
+                    scaleLabel:{
+                    display:true,
+                        labelString: "Mbps"
+                    }
+                }]
+            }
+
+        } 
+    };
+	
+	var ctx_uploads = document.getElementById('uploads').getContext('2d');
+    window.chartColors = {
+            red: 'rgb(255, 99, 132)',
+            orange: 'rgb(255, 159, 64)',
+            yellow: 'rgb(255, 205, 86)',
+            green: 'rgb(75, 192, 192)',
+            blue: 'rgb(54, 162, 235)',
+            purple: 'rgb(153, 102, 255)',
+            grey: 'rgb(201, 203, 207)'
+    };
+
+    window.chart_uploads = new Chart(ctx_uploads, config_uploads);
+    window.count = 0;
+    var time_limit = 5;
+    window.timeleft=time_limit;
+
+    function remove_data(chart){
+        if( chart.data.labels.length >10){
+            chart.data.labels.shift();
+            $(chart.data.datasets).each(function(index, dataset) {
+                 dataset.data.shift;
+             });
+            chart.update();
+        }
+    }
+    function update_chart(chart, resp){
+         $.each(chart.data.datasets, function(index, el){
+                if( index== 0){
+                    el.label = "seedbox"
+                    el.color = window.chartColors.red;
+                } else if(index==1){
+                    el.label = "chunchun"
+                    el.color = window.chartColors.blue;
+
+                } else if(index==2){
+                    el.label = "chomu"
+                    el.color = window.chartColors.green;
+                } else {
+                    el.label = "madoka"
+                    el.color = window.chartColors.yellow;
+                }
+                el.backgroundColor= el.color;
+                el.borderColor=el.color;
+                el.fill=false;
+                var v = -10;
+                if ( resp[el.label].online == true) {
+                    v = resp[el.label].upload_speed *0.001;
+                } else {
+                    //time_limit +=1;
+                    //clearInterval(window.cicle);
+                    //start();
+                }
+                el.data.push(v);
+            });
+            chart.update();
+
+    }
+
+    setInterval(function(){
+        $("#c").text(window.timeleft);
+        window.timeleft -=1;
+
+    }, 1 *1000);
+
+    function start() {
+        console.log("start", time_limit);
+    window.cicle = setInterval(function(){
+        $.getJSON("index.php",function(resp){
+            console.log(resp);
+            window.chart_uploads.data.labels.push(window.count);
+            window.count +=1;
+            update_chart(window.chart_uploads, resp);
+            remove_data(window.chart_uploads);
+            window.timeleft=time_limit;
+            var table= tmp({'servers':resp});
+            console.log(table);
+            $("#table").html(table);
+        });
+        
+    }, time_limit*1000);
+    }
+    start();
+
+});
+
+</script>
+
+
+  </head>
+  <body>
+  <section class="section">
+    <div class="container">
+      <h1 class="title">
+        Puya stats
+      </h1>
+      <p class="subtitle">
+        Seedboxes  update in: <strong id="c">5</strong>!
+      </p>
+
+    
+	    <div style="width:75%;">
+                    <canvas id="uploads"></canvas>
+        </div>
+
+        <div id="table"></div>
+    </div>
+</section>
+
+<script id="tmpl" type="text/x-handlebars-template">
+<table class="table">
+    <tr>
+        <th>Seedbox</th>
+        <th>Online </th>
+        <th>Seeds </th>
+        <th>Torrents </th>
+    </tr>
+    <tbody>
+    {{#each servers }}
+    <tr>
+    <th>{{@key}}</th>
+    <td> {{online}}</td>
+    <td> {{peers}}</td>
+    <td> {{torrents}}</td>
+    </tr>
+    {{/each}}
+    </tbody>
+</table>
+
+</script>
+
+  </body>
